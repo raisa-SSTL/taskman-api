@@ -12,3 +12,4 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/task', [TaskController::class, 'store']);
 Route::get('/task-list', [TaskController::class, 'index']);
+Route::get('show-task-details/{id}', [TaskController::class, "show"]);
