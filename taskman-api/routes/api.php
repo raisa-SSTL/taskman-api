@@ -11,3 +11,4 @@ Route::get('/user', function (Request $request) {
 // T A S K
 
 Route::post('/task', [TaskController::class, 'store']);
+Route::get('/task-list', [TaskController::class, 'index']);

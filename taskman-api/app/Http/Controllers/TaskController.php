@@ -13,6 +13,24 @@ class TaskController extends Controller
     public function index()
     {
         //
+        try {
+            // Retrieve all tasks, sorted by creation date (latest first)
+            $tasks = Task::orderBy('created_at', 'desc')->get();
+
+            // Return a successful JSON response with the tasks
+            return response()->json([
+                'success' => true,
+                'message' => 'Tasks retrieved successfully.',
+                'data' => $tasks,
+            ], 200);
+        } catch (\Exception $e) {
+            // Handle errors and return an appropriate error response
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving tasks.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
