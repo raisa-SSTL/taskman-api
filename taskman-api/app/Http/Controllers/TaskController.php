@@ -90,6 +90,35 @@ class TaskController extends Controller
     public function update(Request $request, string $id)
     {
         //
+        // Validate the incoming request
+        $validatedData = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'priority' => 'nullable|string',
+            'deadline' => 'nullable|date',
+            'status' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date',
+        ]);
+
+        // Find the task by ID
+        $task = Task::find($id);
+
+        // Check if the task exists
+        if (!$task) {
+            return response()->json([
+                'message' => 'Task not found',
+            ], 404);
+        }
+
+        // Update the task with validated data
+        $task->update($validatedData);
+
+        // Return a success response
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'task' => $task,
+        ]);
     }
 
     /**
