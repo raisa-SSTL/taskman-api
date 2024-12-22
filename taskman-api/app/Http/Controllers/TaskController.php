@@ -15,7 +15,7 @@ class TaskController extends Controller
         //
         try {
             // Retrieve all tasks, sorted by creation date (latest first)
-            $tasks = Task::orderBy('created_at', 'desc')->get();
+            $tasks = Task::orderBy('created_at', 'desc')->paginate(5);
 
             // Return a successful JSON response with the tasks
             return response()->json([
