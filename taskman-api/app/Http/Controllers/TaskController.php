@@ -150,4 +150,26 @@ class TaskController extends Controller
             ], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        // Validate the input to ensure 'title' is provided
+        $request->validate([
+            'title' => 'required|string',
+        ]);
+
+        // Retrieve the search query
+        $searchTitle = $request->input('title');
+
+        // Perform the search using a case-insensitive LIKE query
+        $tasks = Task::where('title', 'LIKE', '%' . $searchTitle . '%')->get();
+
+        // Return the results as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+            'message' => count($tasks) > 0 ? 'Tasks retrieved successfully.' : 'No tasks found matching the search query.',
+        ]);
+    }
+
 }

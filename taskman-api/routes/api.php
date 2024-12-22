@@ -15,3 +15,4 @@ Route::get('/task-list', [TaskController::class, 'index']);
 Route::get('show-task-details/{id}', [TaskController::class, "show"]);
 Route::post('/update-task/{id}', [TaskController::class, 'update']);
 Route::post('/delete-task/{id}', [TaskController::class, 'destroy']);
+Route::post('/search-task', [TaskController::class, 'search']);
