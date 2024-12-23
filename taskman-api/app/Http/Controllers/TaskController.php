@@ -172,4 +172,42 @@ class TaskController extends Controller
         ]);
     }
 
+    public function filteredTasks(Request $request)
+    {
+        // Validate the incoming filter data
+        $validated = $request->validate([
+            'priority' => 'array|nullable', // Expecting an array of priorities
+            'status' => 'array|nullable',  // Expecting an array of statuses
+        ]);
+
+        // Retrieve filters from the request
+        $priorityFilter = $validated['priority'] ?? [];
+        $statusFilter = $validated['status'] ?? [];
+
+        // Build the query dynamically
+        $query = Task::query();
+
+        // Apply priority filter if provided
+        if (!empty($priorityFilter)) {
+            $query->whereIn('priority', $priorityFilter);
+        }
+
+        // Apply status filter if provided
+        if (!empty($statusFilter)) {
+            $query->whereIn('status', $statusFilter);
+        }
+
+        // Execute the query to get filtered tasks
+        // $tasks = $query->get();
+        $query->orderBy('created_at', 'desc');
+        $tasks = $query->paginate(5);
+
+        // Return the filtered tasks as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $tasks,
+        ]);
+    }
+
+
 }
