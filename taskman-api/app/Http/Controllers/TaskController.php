@@ -209,5 +209,26 @@ class TaskController extends Controller
         ]);
     }
 
+    public function yearWiseTasks(Request $request)
+    {
+        // Validate the year input
+        $request->validate([
+            'year' => 'required|integer|min:1900|max:' . date('Y'),
+        ]);
+
+        // Get the year from the request
+        $year = $request->input('year');
+
+        // Filter tasks created in the given year
+        $tasks = Task::whereYear('created_at', $year)->get();
+
+        // Return the filtered tasks
+        return response()->json([
+            'success' => true,
+            'tasks' => $tasks,
+        ], 200);
+    }
+
+
 
 }
