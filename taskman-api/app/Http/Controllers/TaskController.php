@@ -229,6 +229,32 @@ class TaskController extends Controller
         ], 200);
     }
 
+    public function monthYearCompletedTasks(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|integer|min:1|max:12', // Month as integer (1-12)
+            'year' => 'required|integer|min:1900',      // Year as integer (>=1900)
+        ]);
+
+        // Extract month and year from the request
+        $month = $request->input('month');
+        $year = $request->input('year');
+
+        // Query tasks with status "Complete" and filter by month and year of end_date, selecting specific fields
+        $tasks = Task::select('id', 'title', 'priority', 'status', 'end_date')
+            ->where('status', 'Complete')
+            ->whereMonth('end_date', $month)
+            ->whereYear('end_date', $year)
+            ->orderBy('end_date', 'desc')
+            ->paginate(5);
+
+        // Return the filtered tasks as a JSON response
+        return response()->json([
+            'success' => true,
+            'tasks' => $tasks,
+        ]);
+    }
+
 
 
 }

@@ -18,3 +18,4 @@ Route::post('/delete-task/{id}', [TaskController::class, 'destroy']);
 Route::post('/search-task', [TaskController::class, 'search']);
 Route::post('/find-filtered-tasks', [TaskController::class, 'filteredTasks']);
 Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks']);
+Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks']);
