@@ -21,28 +21,17 @@ Route::middleware(['auth:api'])->group(function(){
 
     // T A S K
 
-    // Route::post('/task', [TaskController::class, 'store']);
-    // Route::get('/task-list', [TaskController::class, 'index']);
-    // Route::get('show-task-details/{id}', [TaskController::class, "show"]);
-    // Route::post('/update-task/{id}', [TaskController::class, 'update']);
-    // Route::post('/delete-task/{id}', [TaskController::class, 'destroy']);
-    // Route::post('/search-task', [TaskController::class, 'search']);
-    // Route::post('/find-filtered-tasks', [TaskController::class, 'filteredTasks']);
-    // Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks']);
-    // Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks']);
+    Route::post('/task', [TaskController::class, 'store']);
+    Route::get('/task-list', [TaskController::class, 'index']);
+    Route::get('show-task-details/{id}', [TaskController::class, "show"]);
+    Route::post('/update-task/{id}', [TaskController::class, 'update']);
+    Route::post('/delete-task/{id}', [TaskController::class, 'destroy']);
+    Route::post('/search-task', [TaskController::class, 'search']);
+    Route::post('/find-filtered-tasks', [TaskController::class, 'filteredTasks']);
+    Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks']);
+    Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks']);
 
 });
 
-// T A S K
-
-Route::post('/task', [TaskController::class, 'store']);
-Route::get('/task-list', [TaskController::class, 'index']);
-Route::get('show-task-details/{id}', [TaskController::class, "show"]);
-Route::post('/update-task/{id}', [TaskController::class, 'update']);
-Route::post('/delete-task/{id}', [TaskController::class, 'destroy']);
-Route::post('/search-task', [TaskController::class, 'search']);
-Route::post('/find-filtered-tasks', [TaskController::class, 'filteredTasks']);
-Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks']);
-Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks']);
 
 
