@@ -199,8 +199,12 @@ class TaskController extends Controller
         // Retrieve the search query
         $searchTitle = $request->input('title');
 
+        $user = auth()->user();
+
         // Perform the search using a case-insensitive LIKE query
-        $tasks = Task::where('title', 'LIKE', '%' . $searchTitle . '%')->get();
+        $tasks = Task::where('title', 'LIKE', '%' . $searchTitle . '%')
+                        ->where('user_id', $user->id)
+                        ->get();
 
         // Return the results as a JSON response
         return response()->json([
@@ -260,8 +264,19 @@ class TaskController extends Controller
         // Get the year from the request
         $year = $request->input('year');
 
+        $user = auth()->user();
+
         // Filter tasks created in the given year
-        $tasks = Task::whereYear('created_at', $year)->get();
+        $tasks = Task::whereYear('created_at', $year)
+                        ->where('user_id', $user->id)
+                        ->get();
+
+        // if ($tasks->isEmpty()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'No tasks found for the given year.',
+        //     ], 404);
+        // }
 
         // Return the filtered tasks
         return response()->json([
@@ -281,13 +296,23 @@ class TaskController extends Controller
         $month = $request->input('month');
         $year = $request->input('year');
 
+        $user = auth()->user();
+
         // Query tasks with status "Complete" and filter by month and year of end_date, selecting specific fields
         $tasks = Task::select('id', 'title', 'priority', 'status', 'end_date')
             ->where('status', 'Complete')
             ->whereMonth('end_date', $month)
             ->whereYear('end_date', $year)
+            ->where('user_id', $user->id)
             ->orderBy('end_date', 'desc')
             ->paginate(5);
+
+        // if($tasks->isEmpty()) {
+        //     return response()->json([
+        //         'success' => false,
+        //         'message' => 'No tasks found for the given month and year.',
+        //     ], 404);
+        // }
 
         // Return the filtered tasks as a JSON response
         return response()->json([
