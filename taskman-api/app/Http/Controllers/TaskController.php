@@ -14,8 +14,11 @@ class TaskController extends Controller
     {
         //
         try {
+            $user = auth()->user();
+
             // Retrieve all tasks, sorted by creation date (latest first)
-            $tasks = Task::orderBy('created_at', 'desc')->paginate(5);
+            // $tasks = Task::orderBy('created_at', 'desc')->paginate(5);
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(5);
 
             // Return a successful JSON response with the tasks
             return response()->json([
@@ -50,8 +53,13 @@ class TaskController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date',
         ]);
 
+        // Retrieve the currently logged-in user
+        $user = auth()->user();
+
         // Create a new task
-        $task = Task::create($validatedData);
+        // $task = Task::create($validatedData);
+        // Create a new task and associate it with the user
+        $task = $user->tasks()->create($validatedData);
 
         // Return a response
         return response()->json([
@@ -66,8 +74,13 @@ class TaskController extends Controller
     public function show(string $id)
     {
         //
+        $user = auth()->user();
+
         // Attempt to find the task by ID
-        $task = Task::find($id);
+        // $task = Task::find($id);
+        $task = Task::where('id', $id)
+                ->where('user_id', $user->id)
+                ->first();
 
         // Check if the task exists
         if (!$task) {
@@ -101,13 +114,18 @@ class TaskController extends Controller
             'end_date' => 'nullable|date',
         ]);
 
+        $user = auth()->user();
+
         // Find the task by ID
-        $task = Task::find($id);
+        // $task = Task::find($id);
+        $task = Task::where('id', $id)
+                ->where('user_id', $user->id)
+                ->first();
 
         // Check if the task exists
         if (!$task) {
             return response()->json([
-                'message' => 'Task not found',
+                'message' => 'Task not found or you do not have permission to delete this task.',
             ], 404);
         }
 
@@ -128,8 +146,19 @@ class TaskController extends Controller
     {
         //
         try {
+            $user = auth()->user();
             // Find the task by ID
-            $task = Task::findOrFail($id);
+            // $task = Task::findOrFail($id);
+            $task = Task::where('id', $id)
+                    ->where('user_id', $user->id)
+                    ->first();
+
+            if (!$task) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Task not found or you do not have permission to delete this task.',
+                        ], 404);
+            }
 
             // Delete the task
             $task->delete();
@@ -138,15 +167,24 @@ class TaskController extends Controller
             return response()->json([
                 'message' => 'Task deleted successfully!',
             ], 200);
-        } catch (ModelNotFoundException $e) {
-            // Return a not found response if the task doesn't exist
-            return response()->json([
-                'message' => 'Task not found.',
-            ], 404);
-        } catch (Exception $e) {
+        }
+        // } catch (ModelNotFoundException $e) {
+        //     // Return a not found response if the task doesn't exist
+        //     return response()->json([
+        //         'message' => 'Task not found.',
+        //     ], 404);
+        // } catch (Exception $e) {
+        //     // Return a generic error response for other exceptions
+        //     return response()->json([
+        //         'message' => 'An error occurred while deleting the task.',
+        //     ], 500);
+        // }
+        catch (\Exception $e) {
             // Return a generic error response for other exceptions
             return response()->json([
+                'success' => false,
                 'message' => 'An error occurred while deleting the task.',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -184,8 +222,11 @@ class TaskController extends Controller
         $priorityFilter = $validated['priority'] ?? [];
         $statusFilter = $validated['status'] ?? [];
 
+        $user = auth()->user();
+
         // Build the query dynamically
-        $query = Task::query();
+        // $query = Task::query();
+        $query = Task::where('user_id', $user->id);
 
         // Apply priority filter if provided
         if (!empty($priorityFilter)) {
