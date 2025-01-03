@@ -86,7 +86,7 @@ class TaskController extends Controller
         if (!$task) {
             return response()->json([
                 'success' => false,
-                'message' => 'Task not found.'
+                'message' => 'Task not found/ You do not have permission to view this task.'
             ], 404);
         }
 
@@ -125,7 +125,7 @@ class TaskController extends Controller
         // Check if the task exists
         if (!$task) {
             return response()->json([
-                'message' => 'Task not found or you do not have permission to delete this task.',
+                'message' => 'Task not found or you do not have permission to update this task.',
             ], 404);
         }
 
