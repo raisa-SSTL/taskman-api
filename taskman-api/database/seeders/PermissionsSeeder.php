@@ -31,14 +31,22 @@ class PermissionsSeeder extends Seeder
         $permissions = collect($arrayOfPermissionNames)->map(function (
             $permission
             ){
-                return ["name"=>$permission, "guard_name"=>"web"];
+                return ["name"=>$permission, "guard_name"=>"api"];
         });
         Permission::insert($permissions->toArray());
 
-        Role::create(["name"=>"admin"])->givePermissionTo(Permission::all());
-        Role::create(["name"=>"employee"])->givePermissionTo(["access tasks", "update tasks"]);
+        // Role::create(["name"=>"admin"])->givePermissionTo(Permission::all());
+        // Role::create(["name"=>"employee"])->givePermissionTo(["access tasks", "update tasks"]);
 
-        User::find(7)->assignRole("admin");
-        User::find(9)->assignRole("employee");
+        // Create roles with the "api" guard
+        $adminRole = Role::create(["name" => "admin", "guard_name" => "api"]);
+        $employeeRole = Role::create(["name" => "employee", "guard_name" => "api"]);
+
+        // Assign permissions to roles
+        $adminRole->givePermissionTo(Permission::all());
+        $employeeRole->givePermissionTo(["access tasks", "update tasks"]);
+
+        User::find(7)->assignRole('admin');
+        User::find(9)->assignRole('employee');
     }
 }
