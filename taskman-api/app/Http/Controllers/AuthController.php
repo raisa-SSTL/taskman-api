@@ -22,6 +22,9 @@ class AuthController extends Controller
             'email' => $validatedData['email'],
             'password' => bcrypt($validatedData['password'])
         ]);
+        // Assign the 'admin' role to the newly created user
+        $user->assignRole('admin');
+
         $token = auth('api')->login($user);
         return $this->respondWithToken($token);
     }
