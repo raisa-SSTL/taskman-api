@@ -26,7 +26,7 @@ class PermissionsSeeder extends Seeder
             "create tasks",
             "update tasks",
             "delete tasks",
-            "access users",
+            "access employees",
         ];
         $permissions = collect($arrayOfPermissionNames)->map(function (
             $permission
