@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Employee;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -73,6 +74,11 @@ class User extends Authenticatable implements JWTSubject
     public function tasks()
     {
         return $this->hasMany(Task::class);
+    }
+
+    public function employees()
+    {
+        return $this->hasMany(Employee::class, 'admin_id');
     }
 
 }

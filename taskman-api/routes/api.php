@@ -35,6 +35,7 @@ Route::middleware(['auth:api'])->group(function(){
     // E M P L O Y E E
 
     Route::post('/employee', [EmployeeController::class, 'store'])->middleware('can:create employee');
+    Route::get('/employee-list', [EmployeeController::class, 'index'])->middleware('can:access employees');
 });
 
 

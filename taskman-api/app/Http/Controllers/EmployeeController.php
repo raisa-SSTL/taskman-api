@@ -11,41 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class EmployeeController extends Controller
 {
-    //
-    // public function store(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'name' => 'required|string|max:255',
-    //         'email' => 'required|email|unique:users,email',
-    //         'password' => 'required|string|min:6',
-    //         'phone' => 'nullable|string|max:15',
-    //     ]);
-
-    //     // Create the employee as a user
-    //     $employeeUser = User::create([
-    //         'name' => $validated['name'],
-    //         'email' => $validated['email'],
-    //         'password' => Hash::make($validated['password']),
-    //     ]);
-
-    //     // Assign the "employee" role
-    //     $employeeUser->assignRole('employee');
-
-    //     $employee = Employee::create([
-    //         'name' => $validated['name'],
-    //         'email' => $validated['email'],
-    //         'password' => Hash::make($validated['password']),
-    //         'phone' => $validated['phone'],
-    //         'admin_id' => auth()->id(), // Associate with the logged-in admin
-    //     ]);
-
-    //     // return response()->json($employee, 201);
-    //     return response()->json([
-    //         'user' => $employeeUser,
-    //         'employee' => $employee,
-    //     ], 201);
-    // }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -72,12 +37,6 @@ class EmployeeController extends Controller
             $employeeUser->assignRole('employee');
 
             Log::info('User created successfully with ID: ' . $employeeUser->id);
-
-            // Ensure the authenticated admin is valid
-            // $adminId = auth()->id();
-            // if (!$adminId) {
-            //     throw new \Exception('Unauthorized action. Admin must be logged in.');
-            // }
 
             // Create the employee record in the employees table
             $employee = Employee::create([
@@ -112,5 +71,24 @@ class EmployeeController extends Controller
         }
     }
 
+    public function index()
+    {
+        try {
+            $user = auth()->user();
+            $employees = $user->employees()->orderBy('created_at', 'desc')->paginate(5);
 
+            return response()->json([
+                'success' => true,
+                'message' => 'Employees retrieved successfully',
+                'data' => $employees
+            ], 200);
+        }
+        catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while retrieving employees.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
