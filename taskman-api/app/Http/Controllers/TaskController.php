@@ -105,7 +105,7 @@ class TaskController extends Controller
         //
         // Validate the incoming request
         $validatedData = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'nullable|string',
             'deadline' => 'nullable|date',

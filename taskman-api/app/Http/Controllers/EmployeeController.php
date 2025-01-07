@@ -110,4 +110,77 @@ class EmployeeController extends Controller
             'data'=>$employee
         ]);
     }
+
+    public function update(Request $request, $id)
+    {
+        Log::info('Update method called for employee ID: ' . $id);
+
+        $employee = Employee::with('user')->find($id);
+
+        if (!$employee || $employee->admin_id !== auth()->id()) {
+            Log::warning('Employee not found or unauthorized access attempted.', [
+                'employee_id' => $id,
+                'admin_id' => auth()->id(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Employee not found or you do not have permission to update this employee.',
+            ], 404);
+
+        }
+
+        Log::info('Employee retrieved successfully.', [
+            'employee' => $employee->toArray(),
+            'admin_id' => auth()->id(),
+        ]);
+
+        $validated = $request->validate([
+            'name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|unique:users,email,' . $employee->user->id . ',id',
+            'password' => 'nullable|string|min:6', // Password is optional during update
+            'phone' => 'nullable|string|max:15',
+        ]);
+
+        Log::info('Request validated successfully.', [
+            'validated_data' => $validated,
+        ]);
+
+        try {
+            // Update the associated User record
+            $employee->user->update([
+                'name' => $validated['name'] ?? $employee->user->name,
+                'email' => $validated['email'] ?? $employee->user->email,
+                'password' => !empty($validated['password']) ? Hash::make($validated['password']) : $employee->user->password,
+            ]);
+
+            Log::info('User record updated successfully.', [
+                'user_id' => $employee->user->id,
+            ]);
+
+            // Update the Employee record
+            $employee->update([
+                'name' => $validated['name'] ?? $employee->name,
+                'email' => $validated['email'] ?? $employee->email,
+                'phone' => $validated['phone'] ?? $employee->phone,
+            ]);
+
+            Log::info('Employee record updated successfully.', [
+                'employee_id' => $employee->id,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee updated successfully.',
+                'employee' => $employee,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update employee. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }
