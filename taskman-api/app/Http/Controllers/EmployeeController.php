@@ -91,4 +91,23 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    public function show(string $id)
+    {
+        $user = auth()->user();
+        $employee = Employee::where('id', $id)
+                    ->where('admin_id', $user->id)
+                    ->first();
+        if(!$employee){
+            return response()->json([
+                'success'=>false,
+                'message'=>"Employee data not found / You do not have permission to view this employee.",
+            ], 404);
+        }
+        return response()->json([
+            'success'=>true,
+            'message'=>"Employee data retrieved successfully.",
+            'data'=>$employee
+        ]);
+    }
 }
