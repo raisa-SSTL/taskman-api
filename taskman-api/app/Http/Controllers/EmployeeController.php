@@ -226,5 +226,27 @@ class EmployeeController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string',
+        ]);
+
+        $searchTitle = $request->input('name');
+
+        $user = auth()->user();
+
+        $employee = Employee::where('name', 'LIKE', '%' . $searchTitle . '%')
+                        ->where('admin_id', $user->id)
+                        ->get();
+
+        // Return the results as a JSON response
+        return response()->json([
+            'success' => true,
+            'data' => $employee,
+            'message' => count($employee) > 0 ? 'Employee retrieved successfully.' : 'No employee found matching the search query.',
+        ]);
+    }
+
 
 }
