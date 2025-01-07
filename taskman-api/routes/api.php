@@ -38,6 +38,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('/employee-list', [EmployeeController::class, 'index'])->middleware('can:access employees');
     Route::get('/show-employee-details/{id}', [EmployeeController::class, 'show'])->middleware('can:access employees');
     Route::post('/update-employee/{id}', [EmployeeController::class, 'update'])->middleware('can:update employee');
+    Route::post('/delete-employee/{id}', [EmployeeController::class, 'delete'])->middleware('can:delete employee');
 });
 
 

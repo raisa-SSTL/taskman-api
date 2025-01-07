@@ -138,7 +138,7 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'name' => 'nullable|string|max:255',
             'email' => 'nullable|email|unique:users,email,' . $employee->user->id . ',id',
-            'password' => 'nullable|string|min:6', // Password is optional during update
+            'password' => 'nullable|string|min:6',
             'phone' => 'nullable|string|max:15',
         ]);
 
@@ -182,5 +182,49 @@ class EmployeeController extends Controller
             ], 500);
         }
     }
+
+    public function delete($id)
+    {
+        Log::info('Delete method called for employee ID: ' . $id);
+
+        try {
+            // Retrieve the employee record along with the associated user
+            $employee = Employee::with('user')->find($id);
+
+            if (!$employee || $employee->admin_id !== auth()->id()) {
+                Log::warning('Employee not found or unauthorized access attempted.', [
+                    'employee_id' => $id,
+                    'admin_id' => auth()->id(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Employee not found or you do not have permission to delete this employee.',
+                ], 404);
+            }
+
+            // Delete the user record first
+            $employee->user->delete();
+            Log::info('User record deleted successfully.', ['user_id' => $employee->user->id]);
+
+            // Delete the employee record
+            $employee->delete();
+            Log::info('Employee record deleted successfully.', ['employee_id' => $employee->id]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Employee deleted successfully.',
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Exception during delete.', ['error' => $e->getMessage()]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete employee. Please try again.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 
 }
