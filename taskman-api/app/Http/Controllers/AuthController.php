@@ -44,7 +44,6 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth('api')->factory()->getTTL() * 60,
-            // 'user' => $user,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -57,14 +56,7 @@ class AuthController extends Controller
 
     public function me()
     {
-        // return response()->json(auth()->user());
         $user = auth()->user();
-
-        // return response()->json([
-        //     'user' => $user,
-        //     'roles' => $user->getRoleNames(), // Retrieves an array of role names
-        //     'permissions' => $user->getAllPermissions()->pluck('name'), // Retrieves an array of permission names
-        // ]);
         return response()->json([
             'user' => [
                 'id' => $user->id,

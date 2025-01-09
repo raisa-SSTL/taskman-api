@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\UserController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -40,6 +41,11 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('/update-employee/{id}', [EmployeeController::class, 'update'])->middleware('can:update employee');
     Route::post('/delete-employee/{id}', [EmployeeController::class, 'delete'])->middleware('can:delete employee');
     Route::post('/search-employee', [EmployeeController::class, 'search'])->middleware('can:access employees');
+
+    // U S E R
+
+    Route::post('/update-user/{id}', [UserController::class, 'update']);
+
 });
 
 
