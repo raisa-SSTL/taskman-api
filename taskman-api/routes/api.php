@@ -6,6 +6,7 @@ use App\Http\Controllers\TaskController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\AssignedTaskController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -45,6 +46,10 @@ Route::middleware(['auth:api'])->group(function(){
     // U S E R
 
     Route::post('/update-user/{id}', [UserController::class, 'update']);
+
+    // ASSIGN TASKS
+
+    // Route::post('/assign-task', [AssignedTaskController::class, 'assignTask']);
 
 });
 

@@ -29,7 +29,11 @@ class PermissionsSeeder extends Seeder
             "access employees",
             "create employee",
             "update employee",
-            "delete employee"
+            "delete employee",
+            "assign task",
+            "access assigned tasks",
+            "update assigned task",
+            "delete assigned task"
         ];
         $permissions = collect($arrayOfPermissionNames)->map(function (
             $permission
@@ -47,7 +51,7 @@ class PermissionsSeeder extends Seeder
 
         // Assign permissions to roles
         $adminRole->givePermissionTo(Permission::all());
-        $employeeRole->givePermissionTo(["access tasks", "update tasks", "update employee"]);
+        $employeeRole->givePermissionTo(["access tasks", "update tasks", "update employee", "access assigned tasks"]);
 
         User::find(7)->assignRole('admin');
         User::find(9)->assignRole('employee');
