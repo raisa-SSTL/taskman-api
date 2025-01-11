@@ -23,6 +23,7 @@ class Task extends Model
         'status',
         'start_date',
         'end_date',
+        'user_id'
     ];
 
     /**

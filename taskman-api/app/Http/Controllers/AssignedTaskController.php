@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\AssignedTask;
 use App\Models\Task;
 use App\Models\Employee;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class AssignedTaskController extends Controller
 {
@@ -50,5 +52,71 @@ class AssignedTaskController extends Controller
 
         return response()->json(['message' => 'Task assigned successfully', 'assignedTask' => $assignedTask]);
     }
+
+    public function allAssignedTasks()
+    {
+        $assignedTasks = AssignedTask::where('assigned_by', auth()->id())
+                                    ->with([
+                                        'task',
+                                        'employee:id,name,user_id'
+                                    ])
+                                    ->get();
+
+        if ($assignedTasks->isEmpty()){
+            \Log::info('No assigned tasks found for user:', ['id' => auth()->id()]);
+            return response()->json([
+                'message' => "You have not assigned any tasks yet",
+                'data' => []
+            ], 200);
+        }
+
+        \Log::info('Assigned tasks retrieved:', ['tasks' => $assignedTasks]);
+        return response()->json([
+            'message' => 'Assigned Tasks retrieved successfully',
+            'data' => $assignedTasks
+        ], 200);
+    }
+
+    public function employeeAssignedTasks()
+    {
+        try {
+            // Check if the logged-in user has the 'employee' role
+            if (!Auth::user()->hasRole('employee')) {
+                return response()->json([
+                    'message' => 'Unauthorized access. This action is only allowed for employees.',
+                ], 403);
+            }
+
+            // Fetch tasks assigned to the logged-in employee
+            $employee = Employee::where('user_id', auth()->id())->first();
+            if (!$employee) {
+                return response()->json([
+                    'message' => 'Unauthorized access. Employee not found.',
+                ], 403);
+            }
+
+            $employeeTasks = AssignedTask::where('employee_id', $employee->id)
+                ->with(['task'])
+                ->get();
+
+            if ($employeeTasks->isEmpty()) {
+                return response()->json([
+                    'message' => 'Currently you have no assigned tasks',
+                    'data' => []
+                ], 200);
+            }
+
+            return response()->json([
+                'message' => 'List of assigned tasks retrieved successfully',
+                'data' => $employeeTasks
+            ], 200);
+        } catch (\Exception $e) {
+            \Log::error('Error in employeeAssignedTasks:', ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'An unexpected error occurred.',
+            ], 500);
+        }
+    }
+
 
 }

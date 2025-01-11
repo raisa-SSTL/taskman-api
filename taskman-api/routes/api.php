@@ -50,7 +50,8 @@ Route::middleware(['auth:api'])->group(function(){
     // ASSIGN TASKS
 
     Route::post('/assign-task', [AssignedTaskController::class, 'assignTask'])->middleware('can:assign task');
-
+    Route::get('/all-assigned-tasks', [AssignedTaskController::class, 'allAssignedTasks'])->middleware('can:assign task'); //only for admin
+    Route::get('/employee-assigned-tasks', [AssignedTaskController::class, 'employeeAssignedTasks'])->middleware('can:access assigned tasks');
 });
 
 
