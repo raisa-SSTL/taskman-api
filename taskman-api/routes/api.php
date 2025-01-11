@@ -49,7 +49,7 @@ Route::middleware(['auth:api'])->group(function(){
 
     // ASSIGN TASKS
 
-    // Route::post('/assign-task', [AssignedTaskController::class, 'assignTask']);
+    Route::post('/assign-task', [AssignedTaskController::class, 'assignTask'])->middleware('can:assign task');
 
 });
 
