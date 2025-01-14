@@ -28,6 +28,11 @@ class AssignedTaskController extends Controller
             return response()->json(['message' => 'You can only assign tasks that you have created.'], 403);
         }
 
+        // Check if the task status is Complete
+        if ($task->status === 'Complete') {
+            return response()->json(['message' => 'This task is marked as Complete and cannot be assigned to any employee.'], 403);
+        }
+
         // Ensure the logged-in admin can only assign tasks to employees they created
         $employee = Employee::where('id', $request->employee_id)
             ->where('admin_id', auth()->id()) // Verify the employee was created by the logged-in admin
