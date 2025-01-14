@@ -17,8 +17,8 @@ class TaskController extends Controller
             $user = auth()->user();
 
             // Retrieve all tasks, sorted by creation date (latest first)
-            // $tasks = Task::orderBy('created_at', 'desc')->paginate(5);
-            $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(5);
+            // $tasks = $user->tasks()->orderBy('created_at', 'desc')->paginate(5);
+            $tasks = $user->tasks()->orderBy('created_at', 'desc')->get();
 
             // Return a successful JSON response with the tasks
             return response()->json([
