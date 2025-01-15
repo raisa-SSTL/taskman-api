@@ -31,9 +31,11 @@ class PermissionsSeeder extends Seeder
             "update employee",
             "delete employee",
             "assign task",
-            "access assigned tasks",
+            "access assigned task",
             "update assigned task",
-            "delete assigned task"
+            "delete assigned task",
+            "access employee dashboard",
+            "access admin dashboard"
         ];
         $permissions = collect($arrayOfPermissionNames)->map(function (
             $permission
@@ -49,11 +51,22 @@ class PermissionsSeeder extends Seeder
         $adminRole = Role::create(["name" => "admin", "guard_name" => "api"]);
         $employeeRole = Role::create(["name" => "employee", "guard_name" => "api"]);
 
-        // Assign permissions to roles
-        $adminRole->givePermissionTo(Permission::all());
-        $employeeRole->givePermissionTo(["access tasks", "update tasks", "update employee", "access assigned tasks"]);
+        // Exclude specific permissions from admin
+        $excludedPermissionsForAdmin = [
+            "access employee dashboard",
+            "access assigned task",
+            "update assigned task",
+            "delete assigned task",
+        ];
 
-        User::find(7)->assignRole('admin');
-        User::find(9)->assignRole('employee');
+        // Assign permissions to roles
+        // $adminRole->givePermissionTo(Permission::all());
+        $adminPermissions = Permission::whereNotIn('name', $excludedPermissionsForAdmin)->get();
+        // Assign all other permissions to admin
+        $adminRole->syncPermissions($adminPermissions);
+        $employeeRole->givePermissionTo(["update employee", "access assigned task", "access employee dashboard", "update assigned task", "delete assigned task"]);
+
+        User::find(1)->assignRole('admin');
+        User::find(2)->assignRole('employee');
     }
 }
