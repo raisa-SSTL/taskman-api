@@ -31,8 +31,8 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('/delete-task/{id}', [TaskController::class, 'destroy'])->middleware('can:delete tasks');
     Route::post('/search-task', [TaskController::class, 'search'])->middleware('can:access tasks');
     Route::post('/find-filtered-tasks', [TaskController::class, 'filteredTasks'])->middleware('can:access tasks');
-    Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks'])->middleware('can:access dashboard');
-    Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks'])->middleware('can:access dashboard');
+    Route::post('/year-wise-tasks', [TaskController::class, 'yearWiseTasks'])->middleware('can:access admin dashboard');
+    Route::post('/month-year-completed-tasks', [TaskController::class, 'monthYearCompletedTasks'])->middleware('can:access admin dashboard');
 
     // E M P L O Y E E
 
