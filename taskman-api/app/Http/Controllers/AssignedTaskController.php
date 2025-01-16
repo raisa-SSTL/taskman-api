@@ -220,7 +220,17 @@ class AssignedTaskController extends Controller
                 ];
             });
 
-            // Step 6: Return the result
+            // Step 6: Check if all completed task counts are 0
+            $hasCompletedTasks = $result->pluck('completed_task_count')->sum() > 0;
+
+            if (!$hasCompletedTasks) {
+                return response()->json([
+                    'message' => 'No tasks were completed this year',
+                    'data' => [],
+                ]);
+            }
+
+            // Step 7: Return the result
             return response()->json([
                 'message' => 'data retrieved successfully',
                 'data' => $result
