@@ -246,4 +246,50 @@ class AssignedTaskController extends Controller
             return response()->json(['message' => 'An error occurred. Please try again later.'], 500);
         }
     }
+
+    public function completeIncompleteTaskRatio()
+    {
+        // Step 1: Match auth()->id() with user_id in the employees table
+        $employee = Employee::where('user_id', auth()->id())->first();
+
+        if (!$employee) {
+            return response()->json([
+                'message' => 'Employee not found.'
+            ], 404);
+        }
+
+        // Step 2: Find all assigned tasks for this employee
+        $assignedTasks = AssignedTask::where('employee_id', $employee->id)->get();
+
+        if ($assignedTasks->isEmpty()) {
+            return response()->json([
+                'message' => 'This employee has no assigned tasks',
+                'employee_id' => $employee->id,
+                'employee_name' => $employee->name,
+                'totalAssignedTasks' => 0,
+                'completedTasks' => 0,
+                'incompleteTasks' => 0,
+            ]);
+        }
+
+        // Step 3: Calculate the total assigned tasks
+        $totalAssignedTasks = $assignedTasks->count();
+
+        // Step 4: Calculate the number of completed tasks
+        $completedTasks = Task::whereIn('id', $assignedTasks->pluck('task_id'))
+            ->where('status', 'Complete')
+            ->count();
+
+        // Step 5: Calculate the number of incomplete tasks
+        $incompleteTasks = $totalAssignedTasks - $completedTasks;
+
+        // Step 6: Return the response
+        return response()->json([
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->name,
+            'totalAssignedTasks' => $totalAssignedTasks,
+            'completedTasks' => $completedTasks,
+            'incompleteTasks' => $incompleteTasks,
+        ]);
+    }
 }
