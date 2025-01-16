@@ -82,7 +82,7 @@ class AssignedTaskController extends Controller
         ], 200);
     }
 
-    public function employeeAssignedTasks()
+    public function employeeAssignedTasks() //List of tasks assigned to logged in employee
     {
         try {
             // Check if the logged-in user has the 'employee' role
@@ -123,5 +123,117 @@ class AssignedTaskController extends Controller
         }
     }
 
+    // public function employeeWiseAssignedTaskCount()
+    // {
+    //      // Step 1: Validate the request to ensure the year is provided
+    //     $request->validate([
+    //         'year' => 'required|integer',
+    //     ]);
+    //     $year = $request->year;
 
+    //     // Step 2: Check if the authenticated user is an employee and get their employee ID
+    //     $authEmployee = Employee::where('user_id', auth()->id())->first();
+
+    //     if (!$authEmployee) {
+    //         return response()->json(['message' => 'Authenticated user is not an employee.'], 404);
+    //     }
+
+    //     // Step 3: Check if the employee has tasks assigned in the assigned_tasks table
+    //     $authEmployeeTask = AssignedTask::where('employee_id', $authEmployee->id)->first();
+
+    //     if (!$authEmployeeTask) {
+    //         return response()->json(['message' => 'No tasks assigned to the authenticated employee.'], 404);
+    //     }
+
+    //     // Step 4: Find the admin ID who assigned tasks to this employee
+    //     $adminId = $authEmployeeTask->assigned_by;
+
+    //     // Step 5: Get all employees assigned tasks by this admin
+    //     $employees = Employee::whereHas('assignedTasks', function ($query) use ($adminId) {
+    //         $query->where('assigned_by', $adminId);
+    //     })->with(['assignedTasks.task'])->get();
+
+    //     // Step 6: Prepare the result with completed task counts for the given year
+    //     $result = $employees->map(function ($employee) use ($year) {
+    //         $completedTaskCount = $employee->assignedTasks->filter(function ($assignedTask) use ($year) {
+    //             return $assignedTask->task &&
+    //                 $assignedTask->task->status === 'Complete' &&
+    //                 $assignedTask->task->end_date &&
+    //                 $assignedTask->task->end_date->year == $year;
+    //         })->count();
+
+    //         return [
+    //             'employee_name' => $employee->name,
+    //             'completed_task_count' => $completedTaskCount,
+    //         ];
+    //     });
+
+    //     // Step 7: Return the result
+    //     return response()->json($result);
+    // }
+
+    public function employeeWiseAssignedTaskCount(Request $request)
+    {
+        // Validate the request to ensure the year is provided
+        $request->validate([
+            'year' => 'required|integer',
+        ]);
+
+        $year = $request->year;
+
+        try {
+            // Step 1: Check if the authenticated user is an employee and get their employee ID
+            $authEmployee = Employee::where('user_id', auth()->id())->first();
+
+            if (!$authEmployee) {
+                return response()->json(['message' => 'Authenticated user is not an employee.'], 404);
+            }
+
+            // Step 2: Check if the employee has tasks assigned in the assigned_tasks table
+            $authEmployeeTask = AssignedTask::where('employee_id', $authEmployee->id)->first();
+
+            if (!$authEmployeeTask) {
+                return response()->json(['message' => 'No tasks assigned to the authenticated employee.'], 404);
+            }
+
+            // Step 3: Find the admin ID who assigned tasks to this employee
+            $adminId = $authEmployeeTask->assigned_by;
+
+            // Step 4: Get all employees assigned tasks by this admin
+            $employees = Employee::whereHas('assignedTasks', function ($query) use ($adminId) {
+                $query->where('assigned_by', $adminId);
+            })->with(['assignedTasks.task'])->get();
+
+            // Step 5: Prepare the result with completed task counts for the given year
+            $result = $employees->map(function ($employee) use ($year) {
+                $completedTaskCount = $employee->assignedTasks->filter(function ($assignedTask) use ($year) {
+                    // Safeguard against null task or end_date
+                    return $assignedTask->task &&
+                        $assignedTask->task->status === 'Complete' &&
+                        $assignedTask->task->end_date &&
+                        $assignedTask->task->end_date->year == $year;
+                })->count();
+
+                return [
+                    'employee_name' => $employee->name,
+                    'completed_task_count' => $completedTaskCount,
+                ];
+            });
+
+            // Step 6: Return the result
+            return response()->json([
+                'message' => 'data retrieved successfully',
+                'data' => $result
+            ]);
+
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            Log::error('Error in employeeWiseAssignedTaskCount: ' . $e->getMessage(), [
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            // Return a generic error response
+            return response()->json(['message' => 'An error occurred. Please try again later.'], 500);
+        }
+    }
 }

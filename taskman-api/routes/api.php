@@ -52,6 +52,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::post('/assign-task', [AssignedTaskController::class, 'assignTask'])->middleware('can:assign task');
     Route::get('/all-assigned-tasks', [AssignedTaskController::class, 'allAssignedTasks'])->middleware('can:assign task'); //only for admin
     Route::get('/employee-assigned-tasks', [AssignedTaskController::class, 'employeeAssignedTasks'])->middleware('can:access assigned tasks');
+    Route::post('/employee-assignedtask-count', [AssignedTaskController::class, 'employeeWiseAssignedTaskCount'])->middleware('can:access employee dashboard');
 });
 
 
