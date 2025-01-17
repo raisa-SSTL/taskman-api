@@ -54,6 +54,7 @@ Route::middleware(['auth:api'])->group(function(){
     Route::get('/employee-assigned-tasks', [AssignedTaskController::class, 'employeeAssignedTasks'])->middleware('can:access assigned tasks');
     Route::post('/employee-assignedtask-count', [AssignedTaskController::class, 'employeeWiseAssignedTaskCount'])->middleware('can:access employee dashboard');
     Route::get('/complete-incomplete-task-ratio', [AssignedTaskController::class, 'completeIncompleteTaskRatio'])->middleware('can:access employee dashboard');
+    Route::get('/two-months-productivity', [AssignedTaskController::class, 'compareTwoMonthsProductivity'])->middleware('can:access employee dashboard');
 });
 
 

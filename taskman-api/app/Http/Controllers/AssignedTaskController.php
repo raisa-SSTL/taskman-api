@@ -8,6 +8,7 @@ use App\Models\Task;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Carbon;
 
 class AssignedTaskController extends Controller
 {
@@ -290,6 +291,61 @@ class AssignedTaskController extends Controller
             'totalAssignedTasks' => $totalAssignedTasks,
             'completedTasks' => $completedTasks,
             'incompleteTasks' => $incompleteTasks,
+        ]);
+    }
+
+    public function compareTwoMonthsProductivity()
+    {
+        // Step 1: Match auth()->id() with user_id in the employees table
+        $employee = Employee::where('user_id', auth()->id())->first();
+
+        if (!$employee) {
+            return response()->json([
+                'message' => 'Employee not found.'
+            ], 404);
+        }
+
+        // Step 2: Get current month and previous month date ranges
+        $currentMonthStart = Carbon::now()->startOfMonth();
+        $currentMonthEnd = Carbon::now()->endOfMonth();
+        $previousMonthStart = Carbon::now()->subMonth()->startOfMonth();
+        $previousMonthEnd = Carbon::now()->subMonth()->endOfMonth();
+
+        // Step 3: Get month names
+        $currentMonthName = Carbon::now()->format('F'); // e.g., "January"
+        $previousMonthName = Carbon::now()->subMonth()->format('F');
+
+        // Step 4: Fetch assigned tasks for the logged-in employee
+        $assignedTasks = AssignedTask::where('employee_id', $employee->id)->pluck('task_id');
+
+        // Step 5: Count tasks completed in the previous month
+        $previous_month_completed_tasks = Task::whereIn('id', $assignedTasks)
+            ->where('end_date', '>=', $previousMonthStart)
+            ->where('end_date', '<=', $previousMonthEnd)
+            ->count();
+
+        // Step 6: Count tasks completed in the current month
+        $current_month_completed_tasks = Task::whereIn('id', $assignedTasks)
+            ->where('end_date', '>=', $currentMonthStart)
+            ->where('end_date', '<=', $currentMonthEnd)
+            ->count();
+
+        // Step 7: Calculate percentage change
+        if ($previous_month_completed_tasks > 0) {
+            $percentage_change = (($current_month_completed_tasks - $previous_month_completed_tasks) / $previous_month_completed_tasks) * 100;
+        } else {
+            $percentage_change = $current_month_completed_tasks > 0 ? 100 : 0; // Handle division by zero
+        }
+
+        // Step 8: Return the response
+        return response()->json([
+            'employee_id' => $employee->id,
+            'name' => $employee->name,
+            'previous_month' => $previousMonthName,
+            'current_month' => $currentMonthName,
+            'previous_month_completed_tasks' => $previous_month_completed_tasks,
+            'current_month_completed_tasks' => $current_month_completed_tasks,
+            'percentage_change' => round($percentage_change, 2), // Round to 2 decimal places
         ]);
     }
 }
