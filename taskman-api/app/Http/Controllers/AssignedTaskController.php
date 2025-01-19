@@ -410,4 +410,41 @@ class AssignedTaskController extends Controller
             'assignedTask' => $assignedTask
         ], 200);
     }
+
+    public function updateAssignedTask(Request $request, $id)
+    {
+        $employee = Employee::where('user_id', auth()->id())->first();
+        if(!$employee){
+            return response()->json([
+                'message' => 'Employee not found'
+            ], 404);
+        }
+        // Check if there is an assigned task for the authenticated employee
+        $assignedTask = AssignedTask::with('task')
+                        ->where('employee_id', $employee->id)
+                        ->where('task_id', $id)
+                        ->first();
+
+        if (!$assignedTask) {
+            return response()->json([
+                'message' => 'No assigned task found for this employee or task ID',
+            ], 404);
+        }
+
+         // Validate the request data
+        $validatedData = $request->validate([
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'status' => 'nullable|string',
+        ]);
+
+        // Update the task fields
+        $task = $assignedTask->task;
+        $task->update($validatedData);
+
+        return response()->json([
+            'message' => 'Task updated successfully',
+            'task' => $task,
+        ], 200);
+    }
 }
