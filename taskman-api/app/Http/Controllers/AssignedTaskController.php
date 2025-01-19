@@ -386,4 +386,28 @@ class AssignedTaskController extends Controller
             })->values() // Reset keys after sorting
         ], 200);
     }
+
+    public function assignedTaskDetails(Request $request, $id)
+    {
+        $employee = Employee::where('user_id', auth()->id())->first();
+        if(!$employee){
+            return response()->json([
+                'message' => 'Employee not found'
+            ], 404);
+        }
+        // Check if there is an assigned task for the authenticated employee
+        $assignedTask = AssignedTask::with('task')
+                        ->where('employee_id', $employee->id)
+                        ->where('task_id', $id)
+                        ->first();
+
+        if (!$assignedTask) {
+            return response()->json(['message' => 'No assigned task found for this employee or task ID'], 404);
+        }
+
+        // Return task details
+        return response()->json([
+            'assignedTask' => $assignedTask
+        ], 200);
+    }
 }
