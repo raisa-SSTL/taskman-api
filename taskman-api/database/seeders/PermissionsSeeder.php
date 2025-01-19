@@ -31,9 +31,8 @@ class PermissionsSeeder extends Seeder
             "update employee",
             "delete employee",
             "assign task",
-            "access assigned task",
+            "access assigned tasks",
             "update assigned task",
-            "delete assigned task",
             "access employee dashboard",
             "access admin dashboard"
         ];
@@ -54,9 +53,8 @@ class PermissionsSeeder extends Seeder
         // Exclude specific permissions from admin
         $excludedPermissionsForAdmin = [
             "access employee dashboard",
-            "access assigned task",
+            "access assigned tasks",
             "update assigned task",
-            "delete assigned task",
         ];
 
         // Assign permissions to roles
@@ -64,7 +62,7 @@ class PermissionsSeeder extends Seeder
         $adminPermissions = Permission::whereNotIn('name', $excludedPermissionsForAdmin)->get();
         // Assign all other permissions to admin
         $adminRole->syncPermissions($adminPermissions);
-        $employeeRole->givePermissionTo(["update employee", "access assigned task", "access employee dashboard", "update assigned task", "delete assigned task"]);
+        $employeeRole->givePermissionTo(["update employee", "access assigned tasks", "access employee dashboard", "update assigned task"]);
 
         User::find(1)->assignRole('admin');
         User::find(2)->assignRole('employee');
