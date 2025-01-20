@@ -64,7 +64,7 @@ class PermissionsSeeder extends Seeder
         $adminRole->syncPermissions($adminPermissions);
         $employeeRole->givePermissionTo(["update employee", "access assigned tasks", "access employee dashboard", "update assigned task"]);
 
-        User::find(1)->assignRole('admin');
-        User::find(2)->assignRole('employee');
+        // User::find(1)->assignRole('admin');
+        // User::find(2)->assignRole('employee');
     }
 }
