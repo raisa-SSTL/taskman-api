@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 use App\Models\Task;
+use App\Models\AssignedTask;
 
 use Illuminate\Http\Request;
 
@@ -160,25 +161,17 @@ class TaskController extends Controller
                         ], 404);
             }
 
+            // Delete the related assigned task entry if it exists
+            AssignedTask::where('task_id', $task->id)->delete();
+
             // Delete the task
             $task->delete();
 
             // Return a success response
             return response()->json([
-                'message' => 'Task deleted successfully!',
+                'message' => 'Task and its assigned task (if any) deleted successfully!',
             ], 200);
         }
-        // } catch (ModelNotFoundException $e) {
-        //     // Return a not found response if the task doesn't exist
-        //     return response()->json([
-        //         'message' => 'Task not found.',
-        //     ], 404);
-        // } catch (Exception $e) {
-        //     // Return a generic error response for other exceptions
-        //     return response()->json([
-        //         'message' => 'An error occurred while deleting the task.',
-        //     ], 500);
-        // }
         catch (\Exception $e) {
             // Return a generic error response for other exceptions
             return response()->json([
