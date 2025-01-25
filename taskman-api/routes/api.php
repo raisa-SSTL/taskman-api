@@ -19,7 +19,7 @@ Route::group([], function ($router) {
 
 Route::middleware(['auth:api'])->group(function(){
     Route::post('logout', [AuthController::class,'logout']);
-    Route::post('me', [AuthController::class,'me']);
+    Route::get('me', [AuthController::class,'me']);
     Route::post('refresh', [AuthController::class,'refresh']);
 
     // T A S K
