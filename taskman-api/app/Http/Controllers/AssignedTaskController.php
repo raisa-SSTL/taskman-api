@@ -404,6 +404,41 @@ class AssignedTaskController extends Controller
         ], 200);
     }
 
+    //----
+    public function employeeWiseAssignedTaskList2(Request $request, $id)
+    {
+        $employee = Employee::where('id', $id)->first();
+        if(!$employee){
+            return response()->json([
+                'message' => 'Employee not found'
+            ], 404);
+        }
+        $assignedTasks = AssignedTask::where('employee_id', $employee->id)
+                        ->with('task')
+                        ->get();
+        if($assignedTasks->isEmpty()){
+            return response()->json([
+                'message' => 'No task was assigned to this employee'
+            ], 200);
+        }
+        $sortedTasks = $assignedTasks->sortBy(function ($assignedTask) {
+            return optional($assignedTask->task)->deadline; // Handle null deadlines
+        });
+        return response()->json([
+            'employee_id' => $employee->id,
+            'employee_name' => $employee->name,
+            'assigned_task_list' => $sortedTasks->map(function ($assignedTask) {
+                return [
+                    'id' => $assignedTask->id,
+                    'task_id' => $assignedTask->task_id,
+                    'assigned_at' => $assignedTask->created_at,
+                    'task_details' => $assignedTask->task, // Includes task details
+                ];
+            })->values() // Reset keys after sorting
+        ], 200);
+    }
+    //----
+
     public function assignedTaskDetails(Request $request, $id)
     {
         $employee = Employee::where('user_id', auth()->id())->first();
