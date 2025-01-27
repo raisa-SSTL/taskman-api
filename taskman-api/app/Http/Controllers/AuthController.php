@@ -81,6 +81,7 @@ class AuthController extends Controller
 
             // Initialize phone as null
             $phone = null;
+            $employeeId = null;
 
             $role = $user->getRoleNames()->first();
 
@@ -89,6 +90,7 @@ class AuthController extends Controller
                 $employee = Employee::where('user_id', $user->id)->first();
                 if ($employee) {
                     $phone = $employee->phone;
+                    $employeeId = $employee->id;
                 } else {
                     return response()->json([
                         'message' => 'Employee record not found for the user.',
@@ -99,7 +101,8 @@ class AuthController extends Controller
             // Return user details, including phone if the employee exists
             return response()->json([
                 'user' => [
-                    'id' => $user->id,
+                    'user_id' => $user->id,
+                    'employee_id' => $employeeId,
                     'name' => $user->name,
                     'email' => $user->email,
                     'roles' => $user->getRoleNames()->first(), // Array of role names
