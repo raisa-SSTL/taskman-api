@@ -1,3 +1,12 @@
+## Key Features
+✅ JWT Authentication: Secure login & token-based authentication  
+✅ Protected API Routes: Auth middleware restricts access to authenticated users  
+✅ Role & Permission Management: Implemented using Laravel Spatie with permission-based route protection  
+✅ Task & Employee APIs: Complete CRUD functionality for managing tasks and employees  
+✅ Data Filtering & Sorting: APIs for searching, filtering, and sorting table data  
+✅ Analytics APIs: APIs for calculating task progress, employee performance, and workload distribution with support for time-based parameters (month, date, year)  
+✅ Optimized for Charts: Provides analytical data formatted for frontend visualizations
+
 # Project Setup Guide
 
 Follow these steps to set up the project on your local machine:
@@ -51,5 +60,7 @@ Since we're using JWT for authentication, generate a secret key:
 ### Step 7: Start the Development Server
 Start the Laravel development server:
 ## `php artisan serve`
-The application will be accessible at http://localhost:8000 by default.
+The application will be accessible at http://localhost:8000 by default.  
+
+
 
