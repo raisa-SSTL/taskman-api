@@ -1,6 +1,6 @@
 ## Key Features
 ✅ JWT Authentication: Secure login & token-based authentication  
-✅ Protected API Routes: Auth middleware restricts access to authenticated users  
+✅ Protected API Routes: Auth middleware restricts access to un-authenticated users  
 ✅ Role & Permission Management: Implemented using Laravel Spatie with permission-based route protection  
 ✅ Task & Employee APIs: Complete CRUD functionality for managing tasks and employees  
 ✅ Data Filtering & Sorting: APIs for searching, filtering, and sorting table data  
